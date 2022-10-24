@@ -11,7 +11,7 @@ const routes = [
     },
     {
         path: "/session/:id",
-        component: Session
+        component: NavBar
     },
     {
         path: '/:catchAll(.*)',

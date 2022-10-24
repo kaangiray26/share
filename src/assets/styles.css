@@ -26,3 +26,7 @@ body {
     --bs-text-opacity: 1;
     color: rgba(var(--bs-white-rgb), var(--bs-text-opacity)) !important;
 }
+
+.device {
+    background-color: transparent;
+}

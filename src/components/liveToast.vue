@@ -1,5 +1,5 @@
 <template>
-    <div id="liveToast" class="toast-container position-fixed top-0 start-50 translate-middle-x m-2">
+    <div id="liveToast" class="toast-container position-fixed top-0 start-50 translate-middle-x">
         <div ref="toastEle" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
             <div class="d-flex">
                 <div class="toast-body">
