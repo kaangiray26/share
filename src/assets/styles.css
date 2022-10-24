@@ -1,0 +1,28 @@
+html {
+    margin: 0;
+    height: 100%;
+}
+
+body {
+    margin: 0;
+    height: 100%;
+    background-color: #3d5a80;
+}
+
+#app {
+    height: 100%;
+}
+
+#mainCard {
+    background-color: #293241;
+}
+
+.card {
+    --bs-card-border-width: 0px;
+}
+
+.toast {
+    background-color: #293241;
+    --bs-text-opacity: 1;
+    color: rgba(var(--bs-white-rgb), var(--bs-text-opacity)) !important;
+}
