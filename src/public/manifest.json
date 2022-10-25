@@ -5,9 +5,10 @@
         {
             "src": "/assets/square-up-right-solid.svg",
             "type": "image/svg+xml",
-            "sizes": "512x512"
+            "sizes": "450x450"
         }
     ],
+    "id": "/",
     "start_url": "/",
     "background_color": "#3d5a80",
     "theme_color": "#3d5a80",
