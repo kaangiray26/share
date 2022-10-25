@@ -16,7 +16,7 @@ npm run build
 cd src/dist
 
 # if you are deploying to a custom domain
-echo 'share.buzl.uk' > CNAME
+# echo 'share.buzl.uk' > CNAME
 # echo '<script src="https://e-cdns-files.dzcdn.net/js/min/dz.js"></script>' > channel.html
 cp index.html 404.html
 
