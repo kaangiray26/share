@@ -43,7 +43,7 @@ const peer_init = ref(false);
 const thisPeerJS = ref(null);
 
 async function shareLink() {
-    navigator.clipboard.writeText("http://localhost:8000/session/" + peer_id.value).then(function () {
+    navigator.clipboard.writeText("https://share.buzl.uk/session/" + peer_id.value).then(function () {
         notify({
             "n": "Copied to clipboard!",
         });
