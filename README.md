@@ -3,20 +3,8 @@ A Progressive Web App for P2P File Sharing
 
 Check out at https://share.buzl.uk
 
-<div class="row">
-    <div class="column">
-        <img src="images/screenshot_1.png" style="width:100%">
-    </div>
-    <div class="column">
-        <img src="images/screenshot_2.png" style="width:100%">
-    </div>
-    <style>
-        .row {
-            display: flex;
-        }
-        .column {
-            flex: 33.33%;
-            padding: 5px;
-        }
-    </style>
-</div>
+<p align="center">
+  <img alt="ss1" src="images/screenshot_1.png" width="45%">
+&nbsp; &nbsp; &nbsp; &nbsp;
+  <img alt="ss2" src="images/screenshot_2.png" width="45%">
+</p>
