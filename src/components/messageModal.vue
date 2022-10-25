@@ -1,12 +1,12 @@
 <template>
-    <div id="messageModal" class="modal fade" role="dialog" tabindex="-1" aria-hidden="true" ref="modalEle">
+    <div id="messageModal" class="modal" role="dialog" tabindex="-1" aria-hidden="true" ref="modalEle">
         <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content">
                 <div class="modal-body">
                     <div class="input-group">
                         <span class="input-group-text">></span>
-                        <textarea ref="textArea" class="form-control" aria-label="Textarea"
-                            placeholder="Your message..."></textarea>
+                        <input ref="textArea" type="text" class="form-control" placeholder="Message..."
+                            aria-label="message" aria-describedby="basic-addon1" @keyup.enter="emit('send'); hide()">
                         <button class="btn btn-dark" @click="emit('send'); hide()">Send</button>
                     </div>
                 </div>

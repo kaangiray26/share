@@ -38,6 +38,7 @@ const emit = defineEmits(['connected', 'disconnect']);
 
 let thisMessageModal = ref(null);
 let thisContentModal = ref(null);
+
 const fileUpload = ref(null);
 
 const content = ref({});
@@ -72,22 +73,27 @@ async function showFileUpload() {
 }
 
 async function handleFileUpload(event) {
-    console.log("Uploading file...", fileUpload.value.files[0]);
-    var file = fileUpload.value.files[0];
+    notify({
+        "n": "Sending file...",
+    });
     let reader = new FileReader();
-    reader.onload = (res) => {
-        console.log(res.target.result);
+    reader.onload = function (res) {
         props.conn.send({
             type: "file",
-            file: res.target.result,
-            file_name: file.name,
             peer_name: props.peer_name,
+            size: fileUpload.value.files[0].size,
+            f_type: fileUpload.value.files[0].type,
+            f_name: fileUpload.value.files[0].name,
+            f_data: res.target.result,
+        });
+        notify({
+            "n": "File sent.",
         });
     };
+    reader.readAsDataURL(fileUpload.value.files[0]);
 }
 
 props.conn.on("data", async function (data) {
-    console.log("Incoming:", data);
     if (data.type == 'helo') {
         recipient.value = {
             id: data.peer_id,
@@ -124,6 +130,13 @@ props.conn.on("data", async function (data) {
     }
 
     if (data.type == 'message') {
+        content.value = data;
+        thisContentModal.value.show();
+        return;
+    }
+
+    if (data.type == 'file') {
+        store.archive.push(data);
         content.value = data;
         thisContentModal.value.show();
         return;

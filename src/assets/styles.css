@@ -22,11 +22,15 @@ body {
 }
 
 .toast {
-    background-color: #293241;
     --bs-text-opacity: 1;
+    background-color: #3d5a80;
     color: rgba(var(--bs-white-rgb), var(--bs-text-opacity)) !important;
 }
 
 .device {
     background-color: transparent;
+}
+
+.modal-content {
+    --bs-modal-header-border-width: none;
 }

@@ -1,6 +1,7 @@
 <template>
-    <div id="liveToast" class="toast-container position-fixed top-0 start-50 translate-middle-x">
-        <div ref="toastEle" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+    <div id="liveToast" class="toast-container position-fixed top-0 start-50 translate-middle-x mt-2">
+        <div ref="toastEle" class="toast border border-light rounded shadow-lg" role="alert" aria-live="assertive"
+            aria-atomic="true">
             <div class="d-flex">
                 <div class="toast-body">
                     {{ message }}
