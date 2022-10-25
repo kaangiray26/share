@@ -3,7 +3,7 @@
     "name": "Share: A Progressive Web App for P2P File Sharing",
     "icons": [
         {
-            "src": "/assets/square-up-right-solid.svg",
+            "src": "/assets/square-up-right-solid.7279c0b9.svg",
             "type": "image/svg+xml",
             "sizes": "450x450"
         }
