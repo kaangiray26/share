@@ -17,6 +17,10 @@ body {
     background-color: #293241;
 }
 
+#archiveModal {
+    --bs-modal-bg: #293241;
+}
+
 .card {
     --bs-card-border-width: 0px;
 }

@@ -10,11 +10,13 @@
                         </h4>
                     </div>
                     <div v-if="props.content.type == 'message'">
-                        <div class="border border-2 border-dark bg-light rounded text-wrap text-break p-2 mb-2">
+                        <div class="border border-dark bg-light rounded text-wrap text-break p-2 mb-2">
                             <span class="fw-semibold">{{ props.content.message }}</span>
                         </div>
-                        <div class="d-flex justify-content-end">
-                            <button class="btn btn-dark" @click="copyMessage">Copy</button>
+                        <div class="d-flex justify-content-end my-2">
+                            <button type="button" class="btn btn-outline-dark fw-bold me-1" data-bs-dismiss="modal"
+                                aria-label="Close">Ignore</button>
+                            <button class="btn btn-outline-dark fw-bold ms-1" @click="copyMessage">Copy</button>
                         </div>
                     </div>
                     <div v-if="props.content.type == 'file'" class="d-flex flex-column justify-content-center">
@@ -30,8 +32,14 @@
                         </div>
                         <img v-show="props.content.f_type.startsWith('image')" :src="props.content.f_data"
                             class="img-fluid rounded">
+                        <video v-show="props.content.f_type.startsWith('video')" :src="props.content.f_data"
+                            class="rounded" controls />
+                        <audio v-show="props.content.f_type.startsWith('audio')" :src="props.content.f_data"
+                            class="rounded" controls />
                         <div class="d-flex justify-content-end my-2">
-                            <button class="btn btn-dark" @click="saveFile">Save</button>
+                            <button type="button" class="btn btn-outline-dark fw-bold me-1" data-bs-dismiss="modal"
+                                aria-label="Close">Ignore</button>
+                            <button class="btn btn-outline-dark fw-bold ms-1" @click="saveFile">Save</button>
                         </div>
                     </div>
                 </div>

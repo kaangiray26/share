@@ -1,0 +1,17 @@
+{
+    "short_name": "Share",
+    "name": "Share: A Progressive Web App for P2P File Sharing",
+    "icons": [
+        {
+            "src": "/assets/square-up-right-solid.svg",
+            "type": "image/svg+xml",
+            "sizes": "512x512"
+        }
+    ],
+    "start_url": "/",
+    "background_color": "#3d5a80",
+    "display": "standalone",
+    "scope": "/",
+    "theme_color": "#3d5a80",
+    "description": "A Progressive Web App for P2P File Sharing"
+}

@@ -27,7 +27,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 import { store } from '/js/store';
 import { notify } from '/js/notify';
 
@@ -130,13 +130,14 @@ props.conn.on("data", async function (data) {
     }
 
     if (data.type == 'message') {
+        store.archive.unshift(data);
         content.value = data;
         thisContentModal.value.show();
         return;
     }
 
     if (data.type == 'file') {
-        store.archive.push(data);
+        store.archive.unshift(data);
         content.value = data;
         thisContentModal.value.show();
         return;
@@ -156,5 +157,12 @@ const props = defineProps({
     peer_name: {
         type: String,
     }
+});
+
+onMounted(() => {
+    window.addEventListener('content', event => {
+        content.value = store.archive[event.detail];
+        thisContentModal.value.show();
+    });
 });
 </script>
