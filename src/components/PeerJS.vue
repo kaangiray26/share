@@ -76,6 +76,11 @@ async function handleFileUpload(event) {
     notify({
         "n": "Sending file...",
     });
+    props.conn.send({
+        type: "incoming_file",
+        f_name: fileUpload.value.files[0].name,
+        size: fileUpload.value.files[0].size,
+    });
     let reader = new FileReader();
     reader.onload = function (res) {
         props.conn.send({
@@ -93,6 +98,18 @@ async function handleFileUpload(event) {
     reader.readAsDataURL(fileUpload.value.files[0]);
 }
 
+function formatSize(size) {
+    if (size < 1024) {
+        return size + " B";
+    } else if (size < 1024 ** 2) {
+        return (size / 1024).toFixed(2) + " KB";
+    } else if (size < 1024 ** 3) {
+        return (size / (1024 ** 2)).toFixed(2) + " MB";
+    } else {
+        return (size / (1024 ** 3)).toFixed(2) + " GB";
+    }
+}
+
 const deviceImage = computed(() => {
     if (recipient.value.desc.toLowerCase().includes('mobile')) {
         return '/images/phone-fill.png';
@@ -101,7 +118,6 @@ const deviceImage = computed(() => {
 });
 
 props.conn.on("data", async function (data) {
-    console.log(data);
     if (data.type == 'helo') {
         recipient.value = {
             id: data.peer_id,
@@ -148,6 +164,13 @@ props.conn.on("data", async function (data) {
         store.archive.unshift(data);
         content.value = data;
         thisContentModal.value.show();
+        return;
+    }
+
+    if (data.type == 'incoming_file') {
+        notify({
+            "n": "Incoming file: " + data.f_name + "\nSize: " + formatSize(data.size),
+        });
         return;
     }
 });
