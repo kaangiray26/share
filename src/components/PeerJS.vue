@@ -31,6 +31,7 @@
 import { ref, computed, onMounted } from 'vue';
 import { store } from '/js/store';
 import { notify } from '/js/notify';
+import router from '/router';
 
 import messageModal from '/components/messageModal.vue';
 import contentModal from '/components/contentModal.vue';
@@ -51,8 +52,6 @@ const recipient = ref({
     name: '',
     desc: '',
 });
-
-const bitrate = ref(1);
 
 async function poke() {
     props.conn.send({
@@ -111,7 +110,6 @@ const deviceImage = computed(() => {
 });
 
 props.conn.on("data", async function (data) {
-    let now = Date.now();
     if (data.type == 'helo') {
         recipient.value = {
             id: data.peer_id,
@@ -170,6 +168,10 @@ props.conn.on("data", async function (data) {
         );
         return;
     }
+});
+
+props.conn.on('close', () => {
+    router.go('/');
 });
 
 const props = defineProps({
