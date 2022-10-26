@@ -94,6 +94,7 @@ async function handleFileUpload(event) {
 }
 
 props.conn.on("data", async function (data) {
+    console.log(data);
     if (data.type == 'helo') {
         recipient.value = {
             id: data.peer_id,
@@ -104,7 +105,7 @@ props.conn.on("data", async function (data) {
             type: "ehlo",
             peer_id: props.peer_id,
             peer_name: props.peer_name,
-            desc: props.desc,
+            desc: navigator.userAgent,
         });
         emit('connected');
         store.connected = true;

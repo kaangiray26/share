@@ -43,7 +43,8 @@ const peer_init = ref(false);
 const thisPeerJS = ref(null);
 
 async function shareLink() {
-    navigator.clipboard.writeText("https://share.buzl.uk/session/" + peer_id.value).then(function () {
+    console.log(window.location);
+    navigator.clipboard.writeText(window.location + "session/" + peer_id.value).then(function () {
         notify({
             "n": "Copied to clipboard!",
         });
@@ -63,7 +64,7 @@ async function connect(id) {
             type: 'helo',
             peer_id: peer_id.value,
             peer_name: peer_name.value,
-            desc: navigator.platform,
+            desc: navigator.userAgent,
         });
     });
 }
