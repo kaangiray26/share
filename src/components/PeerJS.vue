@@ -6,7 +6,7 @@
                     <div class="dropdown-center">
                         <button class="btn btn-dark border border-3 rounded-circle p-2" data-bs-toggle="dropdown"
                             aria-expanded="false" @click="showOptions">
-                            <img src="/assets/laptop-fill.svg" class="img-fluid m-1" width="64">
+                            <img :src="deviceImage" class="img-fluid m-1" width="64">
                         </button>
                         <ul class="dropdown-menu dropdown-menu-dark border border-light">
                             <li><button class="dropdown-item" @click="poke">Poke</button></li>
@@ -27,7 +27,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import { store } from '/js/store';
 import { notify } from '/js/notify';
 
@@ -44,9 +44,9 @@ const fileUpload = ref(null);
 const content = ref({});
 
 const recipient = ref({
-    id: null,
-    name: null,
-    desc: null,
+    id: '',
+    name: '',
+    desc: '',
 });
 
 async function poke() {
@@ -92,6 +92,13 @@ async function handleFileUpload(event) {
     };
     reader.readAsDataURL(fileUpload.value.files[0]);
 }
+
+const deviceImage = computed(() => {
+    if (recipient.value.desc.toLowerCase().includes('mobile')) {
+        return '/assets/phone-fill.svg';
+    }
+    return '/assets/laptop-fill.svg';
+});
 
 props.conn.on("data", async function (data) {
     console.log(data);

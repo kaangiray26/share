@@ -43,7 +43,6 @@ const peer_init = ref(false);
 const thisPeerJS = ref(null);
 
 async function shareLink() {
-    console.log(window.location);
     navigator.clipboard.writeText(window.location + "session/" + peer_id.value).then(function () {
         notify({
             "n": "Copied to clipboard!",
