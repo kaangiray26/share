@@ -21,8 +21,9 @@
             </div>
         </div>
     </div>
-    <messageModal ref="thisMessageModal" @send="sendMessage"></messageModal>
-    <contentModal ref="thisContentModal" :content="content"></contentModal>
+    <messageModal ref="thisMessageModal" @send="sendMessage" />
+    <contentModal ref="thisContentModal" :content="content" />
+    <incomingFile ref="thisIncomingFileModal" />
     <input ref="fileUpload" type="file" @change="handleFileUpload" hidden>
 </template>
 
@@ -33,11 +34,13 @@ import { notify } from '/js/notify';
 
 import messageModal from '/components/messageModal.vue';
 import contentModal from '/components/contentModal.vue';
+import incomingFile from '/components/incomingFile.vue';
 
 const emit = defineEmits(['connected', 'disconnect']);
 
 let thisMessageModal = ref(null);
 let thisContentModal = ref(null);
+let thisIncomingFileModal = ref(null);
 
 const fileUpload = ref(null);
 
@@ -48,6 +51,8 @@ const recipient = ref({
     name: '',
     desc: '',
 });
+
+const bitrate = ref(1);
 
 async function poke() {
     props.conn.send({
@@ -98,18 +103,6 @@ async function handleFileUpload(event) {
     reader.readAsDataURL(fileUpload.value.files[0]);
 }
 
-function formatSize(size) {
-    if (size < 1024) {
-        return size + " B";
-    } else if (size < 1024 ** 2) {
-        return (size / 1024).toFixed(2) + " KB";
-    } else if (size < 1024 ** 3) {
-        return (size / (1024 ** 2)).toFixed(2) + " MB";
-    } else {
-        return (size / (1024 ** 3)).toFixed(2) + " GB";
-    }
-}
-
 const deviceImage = computed(() => {
     if (recipient.value.desc.toLowerCase().includes('mobile')) {
         return '/images/phone-fill.png';
@@ -118,6 +111,7 @@ const deviceImage = computed(() => {
 });
 
 props.conn.on("data", async function (data) {
+    let now = Date.now();
     if (data.type == 'helo') {
         recipient.value = {
             id: data.peer_id,
@@ -163,14 +157,17 @@ props.conn.on("data", async function (data) {
     if (data.type == 'file') {
         store.archive.unshift(data);
         content.value = data;
+        thisIncomingFileModal.value.hide();
         thisContentModal.value.show();
         return;
     }
 
     if (data.type == 'incoming_file') {
-        notify({
-            "n": "Incoming file: " + data.f_name + "\nSize: " + formatSize(data.size),
-        });
+        thisIncomingFileModal.value.show(
+            data.f_name,
+            data.size,
+            Date.now(),
+        );
         return;
     }
 });

@@ -30,11 +30,11 @@
                             <input type="text" class="form-control text-muted" :value="formatSize(props.content.size)"
                                 aria-describedby="basic-addon1" readonly>
                         </div>
-                        <img v-show="props.content.f_type.startsWith('image')" :src="props.content.f_data"
+                        <img v-if="props.content.f_type.startsWith('image')" :src="props.content.f_data"
                             class="img-fluid rounded">
-                        <video v-show="props.content.f_type.startsWith('video')" :src="props.content.f_data"
+                        <video v-if="props.content.f_type.startsWith('video')" :src="props.content.f_data"
                             class="rounded" controls />
-                        <audio v-show="props.content.f_type.startsWith('audio')" :src="props.content.f_data"
+                        <audio v-if="props.content.f_type.startsWith('audio')" :src="props.content.f_data"
                             class="rounded" controls />
                         <div class="d-flex justify-content-end my-2">
                             <button type="button" class="btn btn-outline-dark fw-bold me-1" data-bs-dismiss="modal"
@@ -104,6 +104,9 @@ const props = defineProps({
 });
 
 onMounted(() => {
-    thisModalObj = new Modal(modalEle.value);
+    thisModalObj = new Modal(modalEle.value, {
+        backdrop: 'static',
+        keyboard: false,
+    });
 });
 </script>
