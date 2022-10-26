@@ -95,9 +95,9 @@ async function handleFileUpload(event) {
 
 const deviceImage = computed(() => {
     if (recipient.value.desc.toLowerCase().includes('mobile')) {
-        return '/assets/phone-fill.svg';
+        return '/images/phone-fill.svg';
     }
-    return '/assets/laptop-fill.svg';
+    return '/images/laptop-fill.svg';
 });
 
 props.conn.on("data", async function (data) {
