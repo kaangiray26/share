@@ -1,0 +1,40 @@
+{
+    "short_name": "Share",
+    "name": "Share: A Progressive Web App for P2P File Sharing",
+    "icons": [
+        {
+            "src": "/images/android-chrome-192x192.png",
+            "sizes": "192x192",
+            "type": "image/png"
+        },
+        {
+            "src": "/images/android-chrome-512x512.png",
+            "sizes": "512x512",
+            "type": "image/png"
+        },
+        {
+            "src": "/images/android-chrome-192x192-maskable.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "maskable"
+        },
+        {
+            "src": "/images/android-chrome-512x512-maskable.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "maskable"
+        },
+        {
+            "src": "/images/favicon-96x96.png",
+            "sizes": "96x96",
+            "type": "image/png"
+        }
+    ],
+    "id": "/",
+    "start_url": "/",
+    "background_color": "#3d5a80",
+    "theme_color": "#3d5a80",
+    "display": "standalone",
+    "description": "A Progressive Web App for P2P File Sharing",
+    "orientation": "portrait"
+}
