@@ -1,21 +1,17 @@
 <template>
-    <div class="row row-cols-1 gx-0 gy-2 h-100 mx-1 px-0 justify-content-center">
-        <PeerJS ref="thisPeerJS" v-if="peer_init" :key="peer_key" :peer="peer" :conn="conn" :peer_id="peer_id"
-            :peer_name="peer_name" />
-        <div class="col-auto align-self-end">
-            <div id="mainCard" class="card shadow-lg mb-1">
-                <div class="card-body">
-                    <h6 class="card-subtitle mb-2 text-muted text-center">Open <span
-                            class="font-monospace fw-bold">Share</span> on other devices to connect 🚀
-                    </h6>
-                    <div class="input-group d-flex justify-content-center">
-                        <div class="form-floating">
-                            <input type="text" class="form-control" id="floatingInputGroup2" :value="peer_name"
-                                readonly>
-                            <label for="floatingInputGroup2">You are known as:</label>
-                        </div>
-                        <button class="btn btn-primary fw-bold" @click="shareLink">Share</button>
+    <div class="d-flex flex-column">
+        <PeerJS v-if="store.init" ref="thisPeerJS" />
+        <div v-if="!store.connected" id="mainCard">
+            <div class="d-flex flex-column text-light">
+                <h6 class="mb-2 text-center">Open <span class="fw-bold">Share</span> on
+                    other devices to connect 🚀
+                </h6>
+                <div class="d-flex bg-light rounded">
+                    <div class="d-flex flex-column flex-fill bg-light overflow-scroll rounded px-2 py-1">
+                        <span class="text-muted">You are known as</span>
+                        <span class="text-dark text-nowrap">{{ store.src.name }}</span>
                     </div>
+                    <button id="btn-share" @click="shareLink">Share</button>
                 </div>
             </div>
         </div>
@@ -25,50 +21,52 @@
 <script setup>
 import { ref, onMounted } from "vue";
 import router from "/router";
-import { Peer } from "peerjs";
 import anime from 'animejs';
-import { notify } from '/js/notify.js';
-import { uniqueNamesGenerator, adjectives, names } from 'unique-names-generator';
-
 import PeerJS from '/components/PeerJS.vue';
-
-const peer = ref(null);
-const conn = ref(null);
-const peer_id = ref(null);
-const peer_name = ref(null);
-
-const peer_key = ref(0);
-const peer_init = ref(false);
+import { Peer } from "peerjs";
+import { notify } from '/js/notify.js';
+import { store } from "/js/store.js";
+import { uniqueNamesGenerator, adjectives, names } from 'unique-names-generator';
 
 const thisPeerJS = ref(null);
 
 async function shareLink() {
-    navigator.clipboard.writeText(window.location + "session/" + peer_id.value).then(function () {
-        notify({
-            "n": "Copied to clipboard!",
+    navigator.clipboard.writeText(window.location + "session/" + store.src.id)
+        .then(() => {
+            notify({
+                "n": "Copied to clipboard!",
+            });
         });
-    }, function (err) {
-        notify({
-            "n": "Failed to copy to clipboard!",
-        });
-    });
 }
 
-async function connect(id) {
-    conn.value = peer.value.connect(id);
-    peer_init.value = true;
+// Peer event handlers
+async function on_open() {
+    if (!router.currentRoute.value.params.id) return;
 
-    conn.value.on("open", () => {
-        conn.value.send({
+    // Connect to peer
+    store.conn = store.peer.connect(router.currentRoute.value.params.id, {
+        reliable: true,
+    });
+    store.init = true;
+
+    // Send helo
+    store.conn.on("open", () => {
+        store.conn.send({
             type: 'helo',
-            peer_id: peer_id.value,
-            peer_name: peer_name.value,
+            id: store.src.id,
+            name: store.src.name,
             desc: navigator.userAgent,
         });
     });
 }
 
+async function on_connection(connection) {
+    store.conn = connection;
+    store.init = true;
+}
+
 onMounted(() => {
+    // Animations
     anime({
         targets: '#mainCard',
         opacity: [0, 1],
@@ -78,23 +76,19 @@ onMounted(() => {
         delay: 200,
     });
 
-    peer_id.value = crypto.randomUUID();
-    peer_name.value = uniqueNamesGenerator({
+    // Set own peer id
+    store.src.id = crypto.randomUUID();
+    store.peer = new Peer([store.src.id]);
+
+    // Set own peer name
+    store.src.name = uniqueNamesGenerator({
         dictionaries: [adjectives, names],
         separator: '',
         style: 'capital',
     });
-    peer.value = new Peer([peer_id.value]);
 
-    peer.value.on('open', () => {
-        if (router.currentRoute.value.params.hasOwnProperty('id')) {
-            connect(router.currentRoute.value.params.id);
-        }
-    })
-
-    peer.value.on('connection', connection => {
-        conn.value = connection;
-        peer_init.value = true;
-    });
+    // Set events
+    store.peer.on('open', on_open);
+    store.peer.on('connection', on_connection);
 });
 </script>

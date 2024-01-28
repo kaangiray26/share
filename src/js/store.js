@@ -8,8 +8,28 @@ async function show_content(index) {
 }
 
 const store = reactive({
-    connected: false,
+    src: {
+        id: null,
+        name: null,
+    },
+    dest: {
+        id: null,
+        name: null
+    },
+    peer: null,
+    conn: null,
     archive: [],
+    connected: false,
+    init: false,
+    chunks: {},
+    progress: {
+        size: 0,
+        total: 0,
+        start: 0,
+        loaded: 0,
+        bitrate: 0,
+        timestamp: 0,
+    },
 });
 
 export { store, show_content }

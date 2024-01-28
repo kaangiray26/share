@@ -1,70 +1,56 @@
 <template>
-    <div class="col align-self-center">
-        <div v-show="store.connected">
-            <div class="card device text-white">
-                <div class="d-inline-flex justify-content-center">
-                    <div class="dropdown-center">
-                        <button class="btn btn-dark border border-3 rounded-circle p-2" data-bs-toggle="dropdown"
-                            aria-expanded="false" @click="showOptions">
-                            <img :src="deviceImage" class="img-fluid m-1" width="64">
-                        </button>
-                        <ul class="dropdown-menu dropdown-menu-dark border border-light">
-                            <li><button class="dropdown-item" @click="poke">Poke</button></li>
-                            <li><button class="dropdown-item" @click="showMessageModal">Send a message</button></li>
-                            <li><button class="dropdown-item" @click="showFileUpload">Send a file</button></li>
-                        </ul>
-                    </div>
+    <div v-if="store.connected">
+        <Progress ref="thisProgressModal" />
+        <div class="card device text-white">
+            <div class="d-inline-flex justify-content-center">
+                <div class="dropdown-center">
+                    <button class="btn btn-dark border border-3 rounded-circle p-2" data-bs-toggle="dropdown"
+                        aria-expanded="false" @click="showOptions">
+                        <img :src="deviceImage" class="img-fluid m-1" width="64">
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-dark p-1 my-2">
+                        <li><button class="dropdown-item" @click="poke">Poke</button></li>
+                        <li><button class="dropdown-item" @click="showMessageModal">Send a message</button></li>
+                        <li><button class="dropdown-item" @click="showFileUpload">Send a file</button></li>
+                    </ul>
                 </div>
-                <div class="card-body text-center">
-                    <h5 class="card-title">{{ recipient.name }}</h5>
-                </div>
+            </div>
+            <div class="card-body text-center">
+                <h5 class="card-title">{{ store.dest.name }}</h5>
             </div>
         </div>
     </div>
-    <messageModal ref="thisMessageModal" @send="sendMessage" />
-    <contentModal ref="thisContentModal" :content="content" />
-    <incomingFile ref="thisIncomingFileModal" />
-    <input ref="fileUpload" type="file" @change="handleFileUpload" hidden>
+    <Message ref="thisMessageModal" />
+    <Content ref="thisContentModal" />
 </template>
 
 <script setup>
 import { ref, computed, onMounted } from 'vue';
+import router from '/router';
+import { Dropdown } from 'bootstrap';
 import { store } from '/js/store';
 import { notify } from '/js/notify';
-import router from '/router';
 
-import messageModal from '/components/messageModal.vue';
-import contentModal from '/components/contentModal.vue';
-import incomingFile from '/components/incomingFile.vue';
+import Content from '../modals/Content.vue';
+import Message from '../modals/Message.vue';
+import Progress from '../modals/Progress.vue';
 
 const emit = defineEmits(['connected', 'disconnect']);
 
-let thisMessageModal = ref(null);
-let thisContentModal = ref(null);
-let thisIncomingFileModal = ref(null);
-
-const fileUpload = ref(null);
+const thisMessageModal = ref(null);
+const thisContentModal = ref(null);
+const thisProgressModal = ref(null);
 
 const content = ref({});
 
 const recipient = ref({
-    id: '',
     name: '',
     desc: '',
 });
 
 async function poke() {
-    props.conn.send({
+    store.conn.send({
         type: "poke",
-        peer_name: props.peer_name,
-    });
-}
-
-async function sendMessage() {
-    props.conn.send({
-        type: "message",
-        message: thisMessageModal.value.get_message(),
-        peer_name: props.peer_name,
     });
 }
 
@@ -73,33 +59,7 @@ async function showMessageModal() {
 }
 
 async function showFileUpload() {
-    fileUpload.value.click();
-}
-
-async function handleFileUpload(event) {
-    notify({
-        "n": "Sending file...",
-    });
-    props.conn.send({
-        type: "incoming_file",
-        f_name: fileUpload.value.files[0].name,
-        size: fileUpload.value.files[0].size,
-    });
-    let reader = new FileReader();
-    reader.onload = function (res) {
-        props.conn.send({
-            type: "file",
-            peer_name: props.peer_name,
-            size: fileUpload.value.files[0].size,
-            f_type: fileUpload.value.files[0].type,
-            f_name: fileUpload.value.files[0].name,
-            f_data: res.target.result,
-        });
-        notify({
-            "n": "File sent.",
-        });
-    };
-    reader.readAsDataURL(fileUpload.value.files[0]);
+    thisProgressModal.value.upload();
 }
 
 const deviceImage = computed(() => {
@@ -109,90 +69,115 @@ const deviceImage = computed(() => {
     return '/images/laptop-fill.png';
 });
 
-props.conn.on("data", async function (data) {
-    if (data.type == 'helo') {
-        recipient.value = {
-            id: data.peer_id,
-            name: data.peer_name,
-            desc: data.desc,
-        };
-        props.conn.send({
-            type: "ehlo",
-            peer_id: props.peer_id,
-            peer_name: props.peer_name,
-            desc: navigator.userAgent,
-        });
-        emit('connected');
-        store.connected = true;
-        return;
-    }
-
-    if (data.type == 'ehlo') {
-        recipient.value = {
-            id: data.peer_id,
-            name: data.peer_name,
-            desc: data.desc,
-        };
-        emit('connected');
-        store.connected = true;
-        return;
-    }
-
-    if (data.type == 'poke') {
-        notify({
-            "n": "Poked by " + data.peer_name,
-        });
-        return;
-    }
-
-    if (data.type == 'message') {
-        store.archive.unshift(data);
-        content.value = data;
-        thisContentModal.value.show();
-        return;
-    }
-
-    if (data.type == 'file') {
-        store.archive.unshift(data);
-        content.value = data;
-        thisIncomingFileModal.value.hide();
-        thisContentModal.value.show();
-        return;
-    }
-
-    if (data.type == 'incoming_file') {
-        thisIncomingFileModal.value.show(
-            data.f_name,
-            data.size,
-            Date.now(),
-        );
-        return;
-    }
-});
-
-props.conn.on('close', () => {
-    router.go('/');
-});
-
-const props = defineProps({
-    peer: {
-        type: Object,
-    },
-    conn: {
-        type: Object,
-    },
-    peer_id: {
-        type: String,
-    },
-    peer_name: {
-        type: String,
-    }
-});
-
 onMounted(() => {
     window.addEventListener('content', event => {
         content.value = store.archive[event.detail];
         thisContentModal.value.show();
+    });
+
+    // Set peer events
+    store.conn.on("data", async function (data) {
+        if (data.type == 'helo') {
+            // Set dest fields
+            store.dest.id = data.id;
+            store.dest.name = data.name;
+
+            // Send response
+            store.conn.send({
+                type: "ehlo",
+                id: store.src.id,
+                name: store.src.name,
+                desc: navigator.userAgent,
+            });
+
+            emit('connected');
+            store.connected = true;
+            return;
+        }
+
+        if (data.type == 'ehlo') {
+            // Set dest fields
+            store.dest.id = data.id;
+            store.dest.name = data.name;
+
+            emit('connected');
+            store.connected = true;
+            return;
+        }
+
+        if (data.type == 'poke') {
+            notify({
+                "n": "You've been poked!",
+            });
+            return;
+        }
+
+        if (data.type == 'message') {
+            data.message = decodeURIComponent(atob(data.message));
+            store.archive.unshift(data);
+            thisContentModal.value.show();
+            return;
+        }
+
+        if (data.type == 'incoming_file') {
+            store.chunks[data.uuid] = {
+                "f_name": data.f_name,
+                "f_type": data.f_type,
+                "size": data.size,
+                "chunks_len": data.chunks_len,
+                "byteLength": data.byteLength,
+                "chunks": []
+            }
+
+            // Reset progress
+            store.progress = {
+                size: 0,
+                total: 0,
+                start: 0,
+                loaded: 0,
+                bitrate: 0,
+                timestamp: 0,
+            }
+
+            store.progress.start = new Date().getTime();
+            store.progress.size = store.chunks[data.uuid].size;
+            store.progress.total = store.chunks[data.uuid].chunks_len;
+            thisProgressModal.value.download();
+            return
+        }
+
+        if (data.type == 'file_chunk') {
+            store.chunks[data.uuid].chunks.push(data.chunk);
+            store.progress.loaded = store.chunks[data.uuid].chunks.length;
+
+            // Check if all chunks have been received
+            if (store.chunks[data.uuid].chunks.length == store.chunks[data.uuid].chunks_len) {
+                thisProgressModal.value.hide();
+
+                // Sort chunks
+                store.chunks[data.uuid].chunks.sort((a, b) => {
+                    return a.chunk_num - b.chunk_num;
+                });
+
+                // Combine chunks arrays and form file
+                let blob = new Blob(store.chunks[data.uuid].chunks, { type: store.chunks[data.uuid].f_type });
+                let f_data = URL.createObjectURL(blob);
+
+                // Add file to archive
+                store.archive.unshift({
+                    "type": "file",
+                    "f_data": f_data,
+                    "size": store.chunks[data.uuid].size,
+                    "f_name": store.chunks[data.uuid].f_name,
+                    "f_type": store.chunks[data.uuid].f_type,
+                });
+                thisContentModal.value.show();
+            }
+        }
+    });
+
+    store.conn.on('close', () => {
+        window.location.href = '/';
     });
 });
 </script>

@@ -1,17 +1,16 @@
 import { createRouter, createWebHistory } from 'vue-router';
-import NavBar from '/components/NavBar.vue';
-import Session from '/views/Session.vue';
 import PageNotFound from '/components/PageNotFound.vue';
+import P2PShare from '/components/P2PShare.vue';
 
 const routes = [
     {
         path: "/",
-        component: NavBar,
+        component: P2PShare,
 
     },
     {
         path: "/session/:id",
-        component: NavBar
+        component: P2PShare
     },
     {
         path: '/:catchAll(.*)',

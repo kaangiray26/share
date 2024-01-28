@@ -1,18 +1,14 @@
 <template>
-    <liveToast ref="thisToast" :message="toastNotification" />
-    <Archive ref="thisArchive" />
-    <nav class="navbar fixed-top">
-        <div class="container-fluid justify-content-end">
+    <Toast ref="thisToast" :message="toastNotification" />
+    <History ref="thisHistory" />
+    <div class="window container">
+        <div class="d-flex justify-content-end">
             <div class="btn-group" role="group">
-                <a type="button" class="btn btn-dark bi bi-arrow-clockwise" href="/"></a>
-                <button v-show="store.connected" type="button" class="btn btn-dark bi bi-archive-fill"
-                    @click="showArchive"></button>
-                <a type="button" class="btn btn-dark bi bi-github" href="https://github.com/kaangiray26/share"></a>
+                <button v-show="store.connected" type="button" class="btn btn-dark bi bi-clock-history"
+                    @click="showHistory"></button>
             </div>
         </div>
-    </nav>
-    <div class="container-fluid d-flex justify-content-center align-items-end h-100 w-100 m-0 p-0">
-        <RouterView />
+        <router-view></router-view>
     </div>
 </template>
 
@@ -20,16 +16,16 @@
 import { ref, onMounted } from 'vue';
 import { store } from '/js/store.js';
 
-import liveToast from "/components/liveToast.vue";
-import Archive from "/components/Archive.vue";
+import Toast from "/modals/Toast.vue";
+import History from "/modals/History.vue";
 
 let thisToast = ref(null);
 const toastNotification = ref("");
 
-let thisArchive = ref(null);
+let thisHistory = ref(null);
 
-async function showArchive() {
-    thisArchive.value.show();
+async function showHistory() {
+    thisHistory.value.show();
 }
 
 async function notify(msg) {
