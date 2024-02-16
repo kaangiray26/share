@@ -80,7 +80,7 @@ async function send_chunk(chunk, uuid, num) {
 async function handleFileUpload(event) {
     store.progress.loaded = 0;
     store.progress.size = fileUpload.value.files[0].size;
-    store.progress.total = Math.ceil(store.progress.size / (1024 * 64));
+    store.progress.total = Math.ceil(store.progress.size / (1024 * 512));
     state.value = "uploading";
     loading.value = true;
 
